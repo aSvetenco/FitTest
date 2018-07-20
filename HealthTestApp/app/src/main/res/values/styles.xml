@@ -1,0 +1,24 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ConnectButton">
+        <item name="android:layout_width">@dimen/spacing_250_dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/spacing_30_dp</item>
+        <item name="android:padding">@dimen/spacing_14_dp</item>
+        <item name="android:drawableStart">@drawable/ic_close</item>
+        <item name="android:drawablePadding">@dimen/spacing_10_dp</item>
+        <item name="android:background">@color/colorGrey</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <dimen name="spacing_30_dp">30dp</dimen>
+    <dimen name="spacing_250_dp">250dp</dimen>
+</resources>

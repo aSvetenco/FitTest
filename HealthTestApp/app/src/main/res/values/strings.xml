@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">HealthTestApp</string>
+    <string name="auth_key">21897488254-2ivj0ls48eb4ks6khg6v361pratctsci.apps.googleusercontent.com</string>
+    <string name="connect_google_fit">Connect GoogleFit</string>
+    <string name="connect_sony">Connect to Sony Health</string>
+    <string name="connect_samsung">Connect to Samsung Health</string>
+    <string name="connected">Connected</string>
+    <string name="retrieve">Retrieve</string>
+
+</resources>
