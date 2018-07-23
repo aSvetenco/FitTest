@@ -7,6 +7,11 @@
     android:padding="@dimen/spacing_14_dp"
     tools:context=".DashboardActivity">
 
+
+
+    
+
+
     <TextView
         android:id="@+id/google_fit"
         style="@style/ConnectButton"

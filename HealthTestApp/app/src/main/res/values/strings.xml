@@ -6,5 +6,6 @@
     <string name="connect_samsung">Connect to Samsung Health</string>
     <string name="connected">Connected</string>
     <string name="retrieve">Retrieve</string>
+    <string name="no_connected_yet">Seems that you have not been connected to any fit service yet, use menu</string>
 
 </resources>
