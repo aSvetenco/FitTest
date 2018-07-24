@@ -7,5 +7,11 @@
     <string name="connected">Connected</string>
     <string name="retrieve">Retrieve</string>
     <string name="no_connected_yet">Seems that you have not been connected to any fit service yet, use menu</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
+    <string name="results_template">Today you have walked - %d steps.</string>
+    <string name="nav_open">open</string>
+    <string name="nav_close">close</string>
+    <string name="by_someone">by - %S</string>
 
 </resources>

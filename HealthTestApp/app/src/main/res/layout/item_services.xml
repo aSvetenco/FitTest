@@ -3,9 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="match_parent">
+    android:gravity="center_vertical"
+    android:padding="@dimen/spacing_14_dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/service_icon"
+        android:layout_marginStart="@dimen/spacing_20_dp"
+        android:layout_width="@dimen/service_icon_width"
+        android:layout_height="@dimen/service_icon_height" />
+
+    <TextView
+        android:id="@+id/service_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_14_dp"
+        android:text="@string/app_name"/>
 
     <android.support.v7.widget.SwitchCompat
+        android:id="@+id/connection_switcher"
+        android:textOff="@string/off"
+        android:textOn="@string/on"
+        android:layout_marginStart="@dimen/spacing_20_dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
