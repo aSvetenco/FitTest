@@ -3,7 +3,6 @@ package com.sa.healthtest.dashboard
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
@@ -13,36 +12,44 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.fitness.FitnessOptions
-import com.google.android.gms.fitness.data.DataSet
 import com.sa.healthtest.R
+import com.sa.healthtest.dashboard.list.ResultsRVAdapter
 import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.GoogleFitConnectService
 import com.sa.healthtest.dashboard.list.ServiceRVAdapter
 import com.sa.healthtest.data.SharedPref
 import com.sa.healthtest.data.model.FitResponse
 import com.sa.healthtest.services.FitConnection
+import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
-    override fun setFitData(steps: Int) {
-
+    override fun setFitData(steps: FitResponse) {
+        tvAlert.visibility = View.GONE
+        results.visibility = View.VISIBLE
+        resultAdapter.setData(steps)
     }
 
     private val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 9991
-    private lateinit var service: GoogleFitConnectService
+    private lateinit var googleService: GoogleFitConnectService
     private lateinit var navMenu: DrawerLayout
     private lateinit var preferences: SharedPref
+    private lateinit var tvAlert: TextView
     private val serviceAdapter = ServiceRVAdapter()
+    private val resultAdapter = ResultsRVAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        tvAlert = findViewById(R.id.alert)
         setSupportActionBar(toolbar)
         val actionbar: ActionBar? = supportActionBar
         navMenu = findViewById(R.id.nav_menu)
@@ -53,9 +60,27 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
             title = ""
         }
         initSharedPreferences()
-        service = GoogleFitConnectService(this)
-        mapAndFillService()
+        googleService = GoogleFitConnectService(this)
+        results.layoutManager = LinearLayoutManager(this)
+        results.adapter = resultAdapter
+        getResults(listOf(googleService))
+        mapAndFillServiceList()
 
+    }
+
+    private fun getResults(services: List<FitConnection>) {
+        var atLeastOnActive = false
+        services.forEach {
+            if (preferences.isConnected(it.javaClass.simpleName)) {
+                it.retrieveData()
+                atLeastOnActive = true
+            }
+        }
+        if (!atLeastOnActive) {
+            results.visibility = View.GONE
+            tvAlert.visibility = View.VISIBLE
+            tvAlert.text = getString(R.string.no_connected_yet)
+        }
     }
 
     private fun initSharedPreferences() {
@@ -63,9 +88,9 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         preferences = SharedPref(sharedPreferences)
     }
 
-    private fun mapAndFillService() {
+    private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse("GoogleFit", 0, R.drawable.ic_google_fit, false),
+                FitResponse(GoogleFitConnectService.TAG, 0, R.drawable.ic_google_fit, false),
                 FitResponse("SamsungHealth", 0, R.drawable.ic_samsung_fit, false))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
@@ -73,26 +98,22 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         connectionChangeListener()
     }
 
-    private fun checkConnectionToFitService() {
-
-    }
-
 
     private fun connectionChangeListener() {
         serviceAdapter.onSwitchStateChangedListener()
                 .doOnNext {
-                    if (it.resourceName == "GoogleFit") {
+                    if (it.resourceName == GoogleFitConnectService.TAG) {
                         handleGoogleConnection(it)
                     } else handleSamsungConnection(it)
                 }
-                .subscribe {}
+                .subscribe()
     }
 
     private fun handleGoogleConnection(data: FitResponse) {
-       when (data.isConnected){
-           true -> service.checkPermission()
-           false -> service.disconnect()
-       }
+        when (data.isConnected) {
+            true -> googleService.checkPermission()
+            false -> googleService.disconnect()
+        }
     }
 
     private fun handleSamsungConnection(data: FitResponse) {
@@ -100,17 +121,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     private fun initNavDrawer() {
-        val toggle = object : ActionBarDrawerToggle(this, navMenu, toolbar, R.string.nav_open, R.string.nav_close) {
-            override fun onDrawerClosed(view: View) {
-                super.onDrawerClosed(view)
-
-            }
-
-            override fun onDrawerOpened(drawerView: View) {
-                super.onDrawerOpened(drawerView)
-
-            }
-        }
+        val toggle = ActionBarDrawerToggle(this, navMenu, toolbar, R.string.nav_open, R.string.nav_close)
         toggle.apply {
             isDrawerIndicatorEnabled = true
             setToolbarNavigationClickListener { navMenu.openDrawer(GravityCompat.START) }
@@ -123,7 +134,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
-                service.connect()
+                googleService.connect()
             }
         }
     }
@@ -136,7 +147,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
                     GoogleSignIn.getLastSignedInAccount(this),
                     options)
         } else {
-            service.connect()
+            googleService.connect()
         }
 
     }
@@ -146,13 +157,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         service.retrieveData()
     }
 
-    private fun updateData() {
-
-    }
-
     override fun error(message: String) {
-
+        Toast.makeText(this, "Error message: $message", Toast.LENGTH_LONG).show()
     }
-
-
 }

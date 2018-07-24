@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GoogleFitConnectService implements FitConnection {
 
-    private static final String TAG = GoogleFitConnectService.class.getSimpleName();
+    public static final String TAG = "GoogleFit";
     private final Activity activity;
     private final ConnectCallback callback;
 
@@ -82,12 +82,14 @@ public class GoogleFitConnectService implements FitConnection {
                     .readData(readRequest)
                     .addOnSuccessListener(dataReadResponse -> {
                         DataSet dataSet = dataReadResponse.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
-                        int value = dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                        if(value == 0) {
-                            callback.error();
-                        } else {
-                            callback.setFitData(new FitResponse("GoogleFit", value, R.drawable.ic_google_fit, true));
-                        }
+                        int value = dataSet.getDataPoints().isEmpty()
+                                ? 0
+                                : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
+                        callback.setFitData(new FitResponse("GoogleFit",
+                                value,
+                                R.drawable.ic_google_fit,
+                                true));
+
                     })
                     .addOnFailureListener(e -> callback.error(e.getMessage()))
                     .addOnCompleteListener(task -> Log.d(TAG, "onComplete()"));

@@ -12,10 +12,15 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ServiceVH>() {
 
     private var items = ArrayList<FitResponse>()
 
-    fun setData(items: List<FitResponse>) {
-        this.items.clear()
-        this.items.addAll(items)
-        notifyDataSetChanged()
+    fun setData(item: FitResponse) {
+        if (items.isEmpty() || !items.contains(item)) {
+            items.add(item)
+            notifyDataSetChanged()
+        } else {
+            val index = items.indexOf(item)
+            items[index] = item
+            notifyItemChanged(index)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceVH =
