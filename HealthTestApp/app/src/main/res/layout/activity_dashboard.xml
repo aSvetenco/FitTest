@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/nav_menu"
-    tools:context=".DashboardActivity"
+    tools:context=".dashboard.DashboardActivity"
     tools:openDrawer="start">
 
     <LinearLayout
@@ -20,32 +20,7 @@
             android:id="@+id/results"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
     </LinearLayout>
 
     <include layout="@layout/nav_menu_dashboard"/>
-
-    
-
-
-<!--    <TextView
-        android:id="@+id/google_fit"
-        style="@style/ConnectButton"
-        android:text="@string/connect_google_fit" />
-
-    <TextView
-        android:id="@+id/samsung"
-        style="@style/ConnectButton"
-        android:text="@string/connect_samsung" />
-
-    <TextView
-        android:id="@+id/sony"
-        style="@style/ConnectButton"
-    android:text="@string/connect_sony" />
-
-    <TextView
-        android:id="@+id/retrieve"
-        style="@style/ConnectButton"
-        android:text="@string/retrieve" />-->
-
 </android.support.v4.widget.DrawerLayout>

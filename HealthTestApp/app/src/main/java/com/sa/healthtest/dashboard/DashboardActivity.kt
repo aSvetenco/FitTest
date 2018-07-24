@@ -1,23 +1,26 @@
-package com.sa.healthtest
+package com.sa.healthtest.dashboard
 
 import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataSet
-import com.sa.healthtest.R.string.retrieve
+import com.sa.healthtest.R
 import com.sa.healthtest.connect.ConnectCallback
 import com.sa.healthtest.connect.GoogleFitConnectService
-import kotlinx.android.synthetic.main.activity_dashboard.*
+import com.sa.healthtest.dashboard.list.ServiceRVAdapter
+import com.sa.healthtest.model.FitResponse
+import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class DashboardActivity : AppCompatActivity(), ConnectCallback {
@@ -29,6 +32,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 9991
     private lateinit var service: GoogleFitConnectService
     private lateinit var navMenu: DrawerLayout
+    private val serviceAdapter = ServiceRVAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +48,26 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
             title = ""
         }
         service = GoogleFitConnectService(this)
+        mapAndFillService()
 
     }
 
-    fun initNavDrawer() {
+    private fun mapAndFillService() {
+        val serviceList: List<FitResponse> = listOf(
+                FitResponse("GoogleFit", 0, R.drawable.ic_google_fit, false),
+                FitResponse("Sumsung Health", 0, R.drawable.ic_samsung_fit, false))
+        services.layoutManager = LinearLayoutManager(this)
+        services.adapter = serviceAdapter
+        serviceAdapter.setData(serviceList)
+        conectionChangeListener()
+    }
+
+    private fun conectionChangeListener() {
+        serviceAdapter.onSwitchStateChangedListener()
+                .subscribe{Toast.makeText(this, "State " + it.resourceName + " changed to " + it.isConnected, Toast.LENGTH_SHORT).show()}
+    }
+
+    private fun initNavDrawer() {
         val toggle = object : ActionBarDrawerToggle(this, navMenu, toolbar, R.string.nav_open, R.string.nav_close) {
             override fun onDrawerClosed(view: View) {
                 super.onDrawerClosed(view)
@@ -66,6 +86,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         navMenu.addDrawerListener(toggle)
         toggle.syncState()
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
