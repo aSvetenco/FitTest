@@ -1,10 +1,8 @@
-package com.sa.healthtest.connect;
+package com.sa.healthtest.services;
 
 public interface FitConnection {
     void checkPermission();
-    boolean isConnected();
     void connect();
     void disconnect();
-    void recordData();
     void retrieveData();
 }

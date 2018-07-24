@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.sa.healthtest.R
-import com.sa.healthtest.model.FitResponse
+import com.sa.healthtest.data.model.FitResponse
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_services.view.*
