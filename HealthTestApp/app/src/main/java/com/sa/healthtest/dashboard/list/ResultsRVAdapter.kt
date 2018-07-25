@@ -13,13 +13,24 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ServiceVH>() {
     private var items = ArrayList<FitResponse>()
 
     fun setData(item: FitResponse) {
-        if (items.isEmpty() || !items.contains(item)) {
+
+        var isAdded = false
+        if (items.isEmpty()) {
             items.add(item)
             notifyDataSetChanged()
         } else {
-            val index = items.indexOf(item)
-            items[index] = item
-            notifyItemChanged(index)
+            for (i in items.indices) {
+                if (items[i].resourceName == item.resourceName) {
+                    items[i] = item
+                    notifyItemChanged(i)
+                    isAdded = true
+                    break
+                }
+            }
+            if (!isAdded) {
+                items.add(item)
+                notifyItemInserted(items.size - 1)
+            }
         }
     }
 

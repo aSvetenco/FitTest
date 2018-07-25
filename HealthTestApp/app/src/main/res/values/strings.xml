@@ -12,5 +12,6 @@
     <string name="nav_open">open</string>
     <string name="nav_close">close</string>
     <string name="by_someone">by - %S</string>
+    <string name="shared_pref">health app preferences</string>
 
 </resources>
