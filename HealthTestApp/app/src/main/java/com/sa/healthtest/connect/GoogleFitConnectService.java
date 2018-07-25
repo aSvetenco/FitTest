@@ -70,7 +70,7 @@ public class GoogleFitConnectService {
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .bucketByTime(1, TimeUnit.DAYS)
+                .bucketByTime(7, TimeUnit.DAYS)
                 .build();
 
         Fitness.getHistoryClient(activity, Objects.requireNonNull(GoogleSignIn.getLastSignedInAccount(activity)))

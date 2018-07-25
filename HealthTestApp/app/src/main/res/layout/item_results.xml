@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/steps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/spacing_14_dp"
+        android:drawableStart="@drawable/ic_shoes"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_14_dp"
+        android:text="@string/results_template" />
+    <TextView
+        android:id="@+id/resource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-20dp"
+        android:padding="@dimen/spacing_10_dp"
+        android:layout_below="@+id/steps"
+        android:layout_alignParentEnd="true"
+        android:text="@string/by_someone"/>
+    </RelativeLayout>
