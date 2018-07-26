@@ -21,7 +21,6 @@ import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
 import com.sa.healthtest.services.GoogleFitConnectService
 import com.sa.healthtest.services.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
-import com.sa.healthtest.services.GoogleFitConnectService.TAG
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -36,7 +35,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         val actionbar: ActionBar? = supportActionBar
         initNavDrawer()
@@ -119,10 +118,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE || requestCode == 65537) {
-                googleService.checkPermission()
-            } else {
-                error(getString(R.string.permission_cancel))
+            when(resultCode) {
+                GOOGLE_FIT_PERMISSIONS_REQUEST_CODE, 65537 -> googleService.checkPermission()
+                222 -> googleService.getAccountFromIntent(data)
+                else -> error(getString(R.string.permission_cancel))
             }
         }
     }

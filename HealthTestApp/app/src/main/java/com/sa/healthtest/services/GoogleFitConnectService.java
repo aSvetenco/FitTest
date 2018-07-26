@@ -1,10 +1,16 @@
 package com.sa.healthtest.services;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.SignInAccount;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
@@ -20,6 +26,7 @@ public class GoogleFitConnectService implements FitConnection {
 
     public static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 9991;
     public static final String TAG = "GoogleFit";
+    private GoogleSignInAccount account;
     private final Activity activity;
     private final ConnectCallback callback;
 
@@ -30,12 +37,26 @@ public class GoogleFitConnectService implements FitConnection {
 
     @Override
     public void checkPermission() {
-        FitnessOptions fitnessOptions = createFitnessOption();
+        getSignInAccount();
+    }
+
+    private void getSignInAccount() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
-        if(GoogleSignIn.getLastSignedInAccount(activity) == null){
-            callback.error("You should signIn before connect to googleFit");
-            return;
+        if (account == null) {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build();
+            GoogleSignInClient client = GoogleSignIn.getClient(activity, gso);
+            Intent signInIntent = client.getSignInIntent();
+            activity.startActivityForResult(signInIntent, 222);
+        } else {
+            this.account = account;
+            requestPermission();
         }
+    }
+
+    private void requestPermission() {
+        FitnessOptions fitnessOptions = createFitnessOption();
         if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
             GoogleSignIn.requestPermissions(
                     activity,
@@ -44,6 +65,15 @@ public class GoogleFitConnectService implements FitConnection {
                     fitnessOptions);
         } else {
             connect();
+        }
+    }
+
+    public void getAccountFromIntent(Intent intent) {
+        try {
+            this.account = GoogleSignIn.getSignedInAccountFromIntent(intent).getResult(ApiException.class);
+            requestPermission();
+        } catch (ApiException e) {
+            callback.error(e.getMessage());
         }
     }
 
