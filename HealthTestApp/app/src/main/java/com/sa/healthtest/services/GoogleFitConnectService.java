@@ -1,6 +1,7 @@
 package com.sa.healthtest.services;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -8,6 +9,8 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.sa.healthtest.R;
 import com.sa.healthtest.data.model.FitResponse;
 
@@ -28,7 +31,12 @@ public class GoogleFitConnectService implements FitConnection {
     @Override
     public void checkPermission() {
         FitnessOptions fitnessOptions = createFitnessOption();
-        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(activity), fitnessOptions)) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
+        if(GoogleSignIn.getLastSignedInAccount(activity) == null){
+            callback.error("You should signIn before connect to googleFit");
+            return;
+        }
+        if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
             GoogleSignIn.requestPermissions(
                     activity,
                     GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
@@ -41,12 +49,13 @@ public class GoogleFitConnectService implements FitConnection {
 
     @Override
     public void disconnect() {
-        Fitness.getConfigClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).disableFit();
-        callback.disconnected(this);
+        Fitness.getRecordingClient(activity, GoogleSignIn.getLastSignedInAccount(activity))
+                .unsubscribe(TYPE_STEP_COUNT_DELTA)
+                .addOnSuccessListener(aVoid -> callback.disconnected(this))
+                .addOnFailureListener(e -> callback.error(e.getMessage()));
     }
 
-    @Override
-    public void connect() {
+    private void connect() {
         Fitness.getRecordingClient(activity, GoogleSignIn.getLastSignedInAccount(activity))
                 .subscribe(TYPE_STEP_COUNT_DELTA)
                 .addOnSuccessListener(aVoid -> {
@@ -56,8 +65,7 @@ public class GoogleFitConnectService implements FitConnection {
                 .addOnFailureListener(e -> callback.error(e.getMessage()));
     }
 
-    @Override
-    public void retrieveData() {
+    private void retrieveData() {
         //Gets daily steps count
         Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity))
                 .readDailyTotal(TYPE_STEP_COUNT_DELTA)
@@ -79,6 +87,4 @@ public class GoogleFitConnectService implements FitConnection {
                 .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
                 .build();
     }
-
-
 }

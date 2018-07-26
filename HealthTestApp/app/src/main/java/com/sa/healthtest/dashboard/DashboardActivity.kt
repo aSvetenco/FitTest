@@ -21,6 +21,7 @@ import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
 import com.sa.healthtest.services.GoogleFitConnectService
 import com.sa.healthtest.services.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
+import com.sa.healthtest.services.GoogleFitConnectService.TAG
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -118,8 +119,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE || requestCode == 65537 ) {
+            if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE || requestCode == 65537) {
                 googleService.checkPermission()
+            } else {
+                error(getString(R.string.permission_cancel))
             }
         }
     }
@@ -135,8 +138,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     override fun disconnected(service: FitConnection) {
+        val tag = service.javaClass.getField("TAG").get(String()).toString()
         preferences.setConnected(service.javaClass.simpleName, false)
-        handleResultsVisibility(false)
+        resultAdapter.removeItem(tag)
+        handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
     override fun error(message: String) {

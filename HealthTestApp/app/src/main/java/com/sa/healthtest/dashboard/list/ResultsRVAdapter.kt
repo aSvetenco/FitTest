@@ -8,12 +8,22 @@ import com.sa.healthtest.R
 import com.sa.healthtest.data.model.FitResponse
 import kotlinx.android.synthetic.main.item_results.view.*
 
-class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ServiceVH>() {
+class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
 
     private var items = ArrayList<FitResponse>()
 
-    fun setData(item: FitResponse) {
+    fun removeItem(tag: String?) {
+        if (items.isNotEmpty()) {
+            for (i in items.indices) {
+                if (items[i].resourceName == tag) {
+                    items.removeAt(i)
+                    notifyItemRemoved(i)
+                }
+            }
+        }
+    }
 
+    fun setData(item: FitResponse) {
         var isAdded = false
         if (items.isEmpty()) {
             items.add(item)
@@ -34,18 +44,18 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ServiceVH>() {
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceVH =
-            ServiceVH(LayoutInflater.from(parent.context).inflate(R.layout.item_results, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsRVAdapter.ResultVH =
+            ResultsRVAdapter.ResultVH(LayoutInflater.from(parent.context).inflate(R.layout.item_results, parent, false))
+
+    override fun onBindViewHolder(holder: ResultsRVAdapter.ResultVH, position: Int) {
+        holder.bind(items[position])
+    }
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    override fun onBindViewHolder(holder: ServiceVH, position: Int) {
-        holder.bind(items[position])
-    }
-
-    class ServiceVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    class ResultVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(item: FitResponse) {
             itemView.steps.text = itemView.context.getString(R.string.results_template, item.stepCount)
