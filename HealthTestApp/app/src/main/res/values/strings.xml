@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">HealthTestApp</string>
-    <string name="auth_key">21897488254-2ivj0ls48eb4ks6khg6v361pratctsci.apps.googleusercontent.com</string>
     <string name="connect_google_fit">Connect GoogleFit</string>
     <string name="connect_sony">Connect to Sony Health</string>
     <string name="connect_samsung">Connect to Samsung Health</string>
@@ -13,5 +12,7 @@
     <string name="nav_open">open</string>
     <string name="nav_close">close</string>
     <string name="by_someone">by - %S</string>
+    <string name="shared_pref">health app preferences</string>
+    <string name="permission_cancel">Without permission you can not use app :)</string>
 
 </resources>
