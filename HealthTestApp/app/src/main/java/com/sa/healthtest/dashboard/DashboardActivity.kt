@@ -19,9 +19,10 @@ import com.sa.healthtest.data.SharedPref
 import com.sa.healthtest.data.model.FitResponse
 import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
+import com.sa.healthtest.services.GoogleAccountManager
 import com.sa.healthtest.services.GoogleFitConnectService
 import com.sa.healthtest.services.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
-import com.sa.healthtest.services.GoogleFitConnectService.TAG
+import com.sa.healthtest.services.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -30,13 +31,14 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
+    private lateinit var googleAccountManager: GoogleAccountManager
     private val serviceAdapter = ServiceRVAdapter()
     private val resultAdapter = ResultsRVAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         val actionbar: ActionBar? = supportActionBar
         initNavDrawer()
@@ -45,9 +47,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-        googleService = GoogleFitConnectService(this)
+
         results.layoutManager = LinearLayoutManager(this)
         results.adapter = resultAdapter
+        googleAccountManager = GoogleAccountManager(this)
+        googleService = GoogleFitConnectService(this, googleAccountManager)
         val services = listOf(googleService)
         getResults(services)
         refresh.setOnRefreshListener { getResults(services) }
@@ -58,7 +62,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         var atLeastOnActive = false
         services.forEach {
             if (preferences.isConnected(it.javaClass.simpleName)) {
-                it.checkPermission()
+                it.connect()
                 atLeastOnActive = true
             }
         }
@@ -99,7 +103,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun handleGoogleConnection(data: FitResponse) {
         nav_menu.closeDrawer(GravityCompat.START)
         when (data.isConnected) {
-            true -> googleService.checkPermission()
+            true -> googleService.connect()
             false -> googleService.disconnect()
         }
     }
@@ -119,10 +123,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE || requestCode == 65537) {
-                googleService.checkPermission()
-            } else {
-                error(getString(R.string.permission_cancel))
+            when (requestCode) {
+                GOOGLE_FIT_PERMISSIONS_REQUEST_CODE -> googleService.connect()
+                SIGN_IN_ACCOUNT_CODE -> googleAccountManager.getAccountFromIntent(data)
+                else -> error(getString(R.string.permission_cancel))
             }
         }
     }
