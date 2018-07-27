@@ -11,7 +11,7 @@
     <string name="results_template">Today you have walked - %d steps.</string>
     <string name="nav_open">open</string>
     <string name="nav_close">close</string>
-    <string name="by_someone">by - %S</string>
+    <string name="by_someone">by - %s</string>
     <string name="shared_pref">health app preferences</string>
     <string name="permission_cancel">Without permission you can not use app :)</string>
 

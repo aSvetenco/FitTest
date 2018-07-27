@@ -3,7 +3,7 @@ package com.sa.healthtest.services;
 public class SamsungHealthService implements FitConnection {
 
     @Override
-    public void checkPermission() {
+    public void connect() {
 
     }
 

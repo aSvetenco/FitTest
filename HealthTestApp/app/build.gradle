@@ -25,6 +25,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
 
     }
+    configurations.compile.resolutionStrategy {
+        force 'com.android.support:support-annotations:27.0.2'
+        failOnVersionConflict()
+    }
+
 }
 
 dependencies {

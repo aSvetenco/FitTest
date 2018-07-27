@@ -59,7 +59,7 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
 
         fun bind(item: FitResponse) {
             itemView.steps.text = itemView.context.getString(R.string.results_template, item.stepCount)
-            itemView.resource.text = item.resourceName
+            itemView.resource.text = itemView.context.getString(R.string.by_someone, item.resourceName)
         }
     }
 }
