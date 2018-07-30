@@ -12,13 +12,11 @@
         android:gravity="center_vertical"
         android:padding="@dimen/spacing_14_dp"
         android:text="@string/results_template" />
-    <TextView
+    <ImageView
         android:id="@+id/resource"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/service_icon_width"
+        android:layout_height="@dimen/service_icon_height"
         android:layout_marginTop="-20dp"
-        android:padding="@dimen/spacing_10_dp"
         android:layout_below="@+id/steps"
-        android:layout_alignParentEnd="true"
-        android:text="@string/by_someone"/>
+        android:layout_alignParentEnd="true" />
     </RelativeLayout>

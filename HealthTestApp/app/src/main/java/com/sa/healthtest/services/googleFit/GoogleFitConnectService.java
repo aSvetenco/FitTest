@@ -19,7 +19,7 @@ public class GoogleFitConnectService implements FitConnection {
 
     public static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 9991;
     public static final int SIGN_IN_ACCOUNT_CODE = 9992;
-    public static final String TAG = "GoogleFit";
+    public static final String TAG = GoogleFitConnectService.class.getSimpleName();
     private GoogleSignInAccount account;
     private GoogleAccountManager accountManager;
     private final Activity activity;

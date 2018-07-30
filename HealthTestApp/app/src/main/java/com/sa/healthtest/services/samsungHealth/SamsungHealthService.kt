@@ -11,9 +11,9 @@ import com.samsung.android.sdk.healthdata.*
 class SamsungHealthService(private val mActivity: Activity) : FitConnection, HealthDataStore.ConnectionListener {
 
     private lateinit var mReporter: StepCountReporter
-
     private lateinit var mHealthDataStore: HealthDataStore
     private val mCallBack = (mActivity as ConnectCallback)
+
     init {
         initSdk()
     }

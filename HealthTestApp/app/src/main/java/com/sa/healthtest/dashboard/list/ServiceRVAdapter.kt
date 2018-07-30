@@ -45,7 +45,7 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
                 .map { getItemPositionByServiceName(serviceName) }
                 .filter { it != NO_POSTION }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ notifyItemChanged(it) })
+                .subscribe { notifyItemChanged(it) }
     }
 
     private fun getItemPositionByServiceName(serviceName: String): Int {
