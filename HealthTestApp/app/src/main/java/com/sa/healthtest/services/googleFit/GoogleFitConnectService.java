@@ -9,7 +9,6 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.sa.healthtest.R;
-import com.sa.healthtest.StringUtilsKt;
 import com.sa.healthtest.data.model.FitResponse;
 import com.sa.healthtest.services.ConnectCallback;
 import com.sa.healthtest.services.FitConnection;
@@ -84,34 +83,19 @@ public class GoogleFitConnectService implements FitConnection {
 
     private void retrieveData() {
         //Gets daily steps count
-<<<<<<< HEAD
         Fitness.getHistoryClient(activity, account)
                 .readDailyTotal(TYPE_STEP_COUNT_DELTA)
                 .addOnSuccessListener(dataSet -> {
                     int value = dataSet.getDataPoints().isEmpty()
                             ? 0
                             : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                    callback.updateFitData(new FitResponse(GoogleFitConnectService.class.getSimpleName(),
+                    callback.updateFitData(new FitResponse(TAG,
                             TAG,
                             value,
                             R.drawable.ic_google_fit,
                             true));
                 })
                 .addOnFailureListener(e -> callback.error(e.getMessage()));
-=======
-//        Fitness.getHistoryClient(activity, account)
-//                .readDailyTotal(TYPE_STEP_COUNT_DELTA)
-//                .addOnSuccessListener(dataSet -> {
-//                    int value = dataSet.getDataPoints().isEmpty()
-//                            ? 0
-//                            : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-//                    callback.updateFitData(new FitResponse(TAG,
-//                            value,
-//                            R.drawable.ic_google_fit,
-//                            true));
-//                })
-//                .addOnFailureListener(e -> callback.error(e.getMessage()));
->>>>>>> develop
     }
 
     private FitnessOptions createFitnessOption() {
