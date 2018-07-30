@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.sa.healthtest.R
 import com.sa.healthtest.data.model.FitResponse
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_services.view.*
 
@@ -14,6 +15,7 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
 
     private var items = ArrayList<FitResponse>()
     private var switchListener = PublishSubject.create<FitResponse>()
+    private val NO_POSTION = -1
 
     fun setData(items: List<FitResponse>) {
         this.items.clear()
@@ -34,6 +36,23 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
 
     override fun onBindViewHolder(holder: ServiceVH, position: Int) {
         holder.bind(items[position], switchListener)
+    }
+
+    fun onUserDeniedPermission(serviceName: String) {
+        Observable.fromIterable(items)
+                .filter { it.resourceName == serviceName }
+                .map { it.isConnected = false }
+                .map { getItemPositionByServiceName(serviceName) }
+                .filter { it != NO_POSTION }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ notifyItemChanged(it) })
+    }
+
+    private fun getItemPositionByServiceName(serviceName: String): Int {
+        for (i in items.indices) {
+            if (items[i].resourceName == serviceName) return i
+        }
+        return NO_POSTION
     }
 
     class ServiceVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {

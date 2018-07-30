@@ -7,4 +7,5 @@ public interface ConnectCallback {
     void disconnected(FitConnection service);
     void updateFitData(FitResponse steps);
     void error(String message);
+    void onPermissionDenied(FitConnection service);
 }

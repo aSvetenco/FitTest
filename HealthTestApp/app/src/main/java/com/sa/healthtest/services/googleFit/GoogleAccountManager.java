@@ -1,4 +1,4 @@
-package com.sa.healthtest.services;
+package com.sa.healthtest.services.googleFit;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import com.google.android.gms.common.api.ApiException;
 import io.reactivex.Single;
 import io.reactivex.subjects.SingleSubject;
 
-import static com.sa.healthtest.services.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE;
+import static com.sa.healthtest.services.googleFit.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE;
 
 public class GoogleAccountManager {
 
