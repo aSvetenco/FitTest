@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.sa.healthtest.R
@@ -84,14 +85,14 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse(getString(R.string.google_fit),
-                        0,
-                        R.drawable.ic_google_fit,
-                        preferences.isConnected(googleService.javaClass.simpleName)),
-                FitResponse(getString(R.string.samsung_health),
-                        0,
-                        R.drawable.ic_samsung_fit,
-                        preferences.isConnected(samsungService::class.java.simpleName)))
+                FitResponse(googleService::class.java.simpleName,
+                        getString(R.string.google_fit),
+                        icon = R.drawable.ic_google_fit,
+                        isConnected = preferences.isConnected(googleService.javaClass.simpleName)),
+                FitResponse(samsungService::class.java.simpleName,
+                        getString(R.string.samsung_health),
+                        icon = R.drawable.ic_samsung_fit,
+                        isConnected = preferences.isConnected(samsungService::class.java.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -101,11 +102,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun connectionChangeListener() {
         serviceAdapter.onSwitchStateChangedListener()
                 .doOnNext {
-                    if (it.resourceName == GoogleFitConnectService.TAG) {
-                        handleGoogleConnection(it)
-                    } else handleSamsungConnection(it)
-                }
-                .subscribe()
+                    when (it.tagName) {
+                        GoogleFitConnectService::class.java.simpleName -> handleGoogleConnection(it)
+                        SamsungHealthService::class.java.simpleName -> handleSamsungConnection(it)
+                    }
+                }.subscribe()
     }
 
     private fun handleGoogleConnection(data: FitResponse) {
@@ -172,6 +173,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onPermissionDenied(service: FitConnection?) {
         if (service == null) return
+        Log.d("DashboardActivity", "onPermissionDenied ${service::class.java.simpleName}")
         serviceAdapter.onUserDeniedPermission(service::class.java.simpleName)
     }
 }
