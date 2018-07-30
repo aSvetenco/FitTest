@@ -69,9 +69,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun getResults(services: List<FitConnection>) {
         var atLeastOnActive = false
         services.forEach {
-            if (it::class.java.simpleName != SAMSUNG_HEALTH_SERVICE_NAME)
+            if (preferences.isConnected(it::class.java.simpleName)) {
                 it.connect()
-            atLeastOnActive = true
+                atLeastOnActive = true
+            }
         }
         handleResultsVisibility(atLeastOnActive)
     }
@@ -83,14 +84,14 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse(GoogleFitConnectService.TAG,
+                FitResponse(getString(R.string.google_fit),
                         0,
                         R.drawable.ic_google_fit,
                         preferences.isConnected(googleService.javaClass.simpleName)),
-                FitResponse(samsungService.javaClass.simpleName,
+                FitResponse(getString(R.string.samsung_health),
                         0,
                         R.drawable.ic_samsung_fit,
-                        preferences.isConnected(samsungService.javaClass.simpleName)))
+                        preferences.isConnected(samsungService::class.java.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -150,14 +151,13 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     override fun successConnected(service: FitConnection) {
-        preferences.setConnected(service.javaClass.simpleName, true)
+        preferences.setConnected(service::class.java.simpleName, true)
         handleResultsVisibility(true)
     }
 
     override fun disconnected(service: FitConnection) {
-        val tag = service.javaClass.simpleName
-        preferences.setConnected(service.javaClass.simpleName, false)
-        resultAdapter.removeItem(tag)
+        preferences.setConnected(service::class.java.simpleName, false)
+        resultAdapter.removeItem(service::class.java.simpleName)
         handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
