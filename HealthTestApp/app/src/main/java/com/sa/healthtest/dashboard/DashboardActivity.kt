@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private val TAG = DashboardActivity::class.java.simpleName
-    private val SAMSUNG_HEALTH_SERVICE_NAME = SamsungHealthService::class.java.simpleName
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
@@ -66,9 +65,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun getResults(services: List<FitConnection>) {
         var atLeastOnActive = false
         services.forEach {
-            if (it::class.java.simpleName != SAMSUNG_HEALTH_SERVICE_NAME)
+            if (preferences.isConnected(it::class.java.simpleName)) {
                 it.connect()
-            atLeastOnActive = true
+                atLeastOnActive = true
+            }
         }
         handleResultsVisibility(atLeastOnActive)
     }
@@ -80,14 +80,14 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse(GoogleFitConnectService.TAG,
+                FitResponse(getString(R.string.google_fit),
                         0,
                         R.drawable.ic_google_fit,
-                        preferences.isConnected(googleService.javaClass.simpleName)),
-                FitResponse("SamsungHealth",
+                        preferences.isConnected(googleService::class.java.simpleName)),
+                FitResponse(getString(R.string.samsung_health),
                         0,
                         R.drawable.ic_samsung_fit,
-                        false))
+                        preferences.isConnected(samsungService::class.java.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -147,14 +147,13 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     override fun successConnected(service: FitConnection) {
-        preferences.setConnected(service.javaClass.simpleName, true)
+        preferences.setConnected(service::class.java.simpleName, true)
         handleResultsVisibility(true)
     }
 
     override fun disconnected(service: FitConnection) {
-        val tag = service.javaClass.getField("TAG").get(String()).toString()
-        preferences.setConnected(service.javaClass.simpleName, false)
-        resultAdapter.removeItem(tag)
+        preferences.setConnected(service::class.java.simpleName, false)
+        resultAdapter.removeItem(service::class.java.simpleName)
         handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
