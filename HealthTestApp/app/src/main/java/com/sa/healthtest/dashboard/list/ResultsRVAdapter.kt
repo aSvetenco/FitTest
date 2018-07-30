@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.sa.healthtest.R
 import com.sa.healthtest.data.model.FitResponse
+import com.sa.healthtest.utils.inflate
 import kotlinx.android.synthetic.main.item_results.view.*
 
 class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
@@ -45,7 +46,7 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsRVAdapter.ResultVH =
-            ResultsRVAdapter.ResultVH(LayoutInflater.from(parent.context).inflate(R.layout.item_results, parent, false))
+            ResultsRVAdapter.ResultVH(parent.inflate(R.layout.item_results))
 
     override fun onBindViewHolder(holder: ResultsRVAdapter.ResultVH, position: Int) {
         holder.bind(items[position])
