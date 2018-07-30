@@ -9,6 +9,7 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.sa.healthtest.R;
+import com.sa.healthtest.StringUtilsKt;
 import com.sa.healthtest.data.model.FitResponse;
 
 import io.reactivex.disposables.Disposable;

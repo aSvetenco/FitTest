@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.sa.healthtest.R
 import com.sa.healthtest.data.model.FitResponse
+import com.sa.healthtest.utils.inflate
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_services.view.*
@@ -26,7 +27,7 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceVH =
-            ServiceVH(LayoutInflater.from(parent.context).inflate(R.layout.item_services, parent, false))
+            ServiceVH(parent.inflate(R.layout.item_services))
 
     override fun getItemCount(): Int {
         return items.size
