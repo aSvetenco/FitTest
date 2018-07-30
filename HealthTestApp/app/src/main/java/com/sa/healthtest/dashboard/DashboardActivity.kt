@@ -32,8 +32,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private val TAG = DashboardActivity::class.java.simpleName
-    private val SAMSUNG_HEALTH_SERVICE_NAME = SamsungHealthService::class.java.simpleName
-
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
@@ -100,13 +98,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     private fun connectionChangeListener() {
-        serviceAdapter.onSwitchStateChangedListener()
-                .doOnNext {
-                    when (it.tagName) {
-                        GoogleFitConnectService::class.java.simpleName -> handleGoogleConnection(it)
-                        SamsungHealthService::class.java.simpleName -> handleSamsungConnection(it)
-                    }
-                }.subscribe()
+        serviceAdapter.switchListener = { response ->
+            if (response.resourceName == getString(R.string.google_fit)) {
+                handleGoogleConnection(response)
+            } else handleSamsungConnection(response)
+        }
     }
 
     private fun handleGoogleConnection(data: FitResponse) {
@@ -140,7 +136,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
             when (requestCode) {
                 GOOGLE_FIT_PERMISSIONS_REQUEST_CODE -> googleService.connect()
                 SIGN_IN_ACCOUNT_CODE -> googleAccountManager.getAccountFromIntent(data)
-                else -> error(getString(R.string.permission_cancel))
+                else -> {
+                    onPermissionDenied(googleService)
+                    error(getString(R.string.permission_cancel))
+                }
             }
         }
     }
