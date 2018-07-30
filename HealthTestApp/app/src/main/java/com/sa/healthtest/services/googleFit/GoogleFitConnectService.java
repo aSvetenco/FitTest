@@ -83,18 +83,18 @@ public class GoogleFitConnectService implements FitConnection {
 
     private void retrieveData() {
         //Gets daily steps count
-        Fitness.getHistoryClient(activity, account)
-                .readDailyTotal(TYPE_STEP_COUNT_DELTA)
-                .addOnSuccessListener(dataSet -> {
-                    int value = dataSet.getDataPoints().isEmpty()
-                            ? 0
-                            : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                    callback.updateFitData(new FitResponse(TAG,
-                            value,
-                            R.drawable.ic_google_fit,
-                            true));
-                })
-                .addOnFailureListener(e -> callback.error(e.getMessage()));
+//        Fitness.getHistoryClient(activity, account)
+//                .readDailyTotal(TYPE_STEP_COUNT_DELTA)
+//                .addOnSuccessListener(dataSet -> {
+//                    int value = dataSet.getDataPoints().isEmpty()
+//                            ? 0
+//                            : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
+//                    callback.updateFitData(new FitResponse(TAG,
+//                            value,
+//                            R.drawable.ic_google_fit,
+//                            true));
+//                })
+//                .addOnFailureListener(e -> callback.error(e.getMessage()));
     }
 
     private FitnessOptions createFitnessOption() {

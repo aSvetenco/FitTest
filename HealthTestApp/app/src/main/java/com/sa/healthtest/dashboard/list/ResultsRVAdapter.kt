@@ -15,7 +15,7 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
     fun removeItem(tag: String?) {
         if (items.isNotEmpty()) {
             for (i in items.indices) {
-                if (items[i].resourceName == tag) {
+                if (items[i].tagName == tag) {
                     items.removeAt(i)
                     notifyItemRemoved(i)
                 }

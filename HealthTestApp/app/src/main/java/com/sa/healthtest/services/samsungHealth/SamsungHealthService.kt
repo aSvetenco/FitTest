@@ -21,7 +21,6 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     private fun initSdk() {
         try {
             HealthDataService().also { it.initialize(mActivity) }
-            mHealthDataStore = HealthDataStore(mActivity, this).also { it.connectService() }
         } catch (e: Exception) {
             with("Error initializing HealthDataService") {
                 Log.e(TAG, this, e)
@@ -31,13 +30,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     }
 
     override fun connect() {
-        val isPermGranted = isPermissionAcquired()
-        if (isPermGranted != null && isPermGranted) {
-            mCallBack.successConnected(this)
-            startReceivingData()
-        } else {
-            requestPermission()
-        }
+        mHealthDataStore = HealthDataStore(mActivity, this).also { it.connectService() }
     }
 
     override fun disconnect() {
@@ -55,6 +48,8 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
             if (isPermGranted) {
                 mCallBack.successConnected(this)
                 startReceivingData()
+            } else {
+                requestPermission()
             }
         }
     }
@@ -63,6 +58,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
      * Samsung heath connection error
      */
     override fun onConnectionFailed(result: HealthConnectionErrorResult?) {
+        mCallBack.onPermissionDenied(this)
         mCallBack.error(when (result?.errorCode) {
             HealthConnectionErrorResult.PLATFORM_NOT_INSTALLED -> mActivity.getString(R.string.req_install)
             HealthConnectionErrorResult.OLD_VERSION_PLATFORM -> mActivity.getString(R.string.req_update)
@@ -72,7 +68,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     }
 
     /**
-     * Samsung heath disconnected. Invoked only
+     * Samsung heath disconnected. Is invoked only
      * if samsung health service crashes
      */
     override fun onDisconnected() {
@@ -108,7 +104,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     private fun startReceivingData() {
         mReporter.start {
             mCallBack.updateFitData(
-                    FitResponse(TAG,
+                    FitResponse(this::class.java.simpleName,
                             stepCount = it,
                             icon = R.drawable.ic_samsung_fit,
                             isConnected = true))
@@ -134,6 +130,6 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     }
 
     companion object {
-        private val TAG = SamsungHealthService::class.java.simpleName
+        val TAG = SamsungHealthService::class.java.simpleName
     }
 }
