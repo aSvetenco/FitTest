@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.sa.healthtest.R
@@ -32,10 +33,12 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private val TAG = DashboardActivity::class.java.simpleName
     private val SAMSUNG_HEALTH_SERVICE_NAME = SamsungHealthService::class.java.simpleName
+
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var samsungService: SamsungHealthService
+
     private val serviceAdapter = ServiceRVAdapter()
     private val resultAdapter = ResultsRVAdapter()
 
@@ -47,6 +50,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         val actionbar: ActionBar? = supportActionBar
         initNavDrawer()
         initSharedPreferences()
+
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
@@ -66,9 +70,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun getResults(services: List<FitConnection>) {
         var atLeastOnActive = false
         services.forEach {
-            if (it::class.java.simpleName != SAMSUNG_HEALTH_SERVICE_NAME)
+            if (preferences.isConnected(it::class.java.simpleName)) {
                 it.connect()
-            atLeastOnActive = true
+                atLeastOnActive = true
+            }
         }
         handleResultsVisibility(atLeastOnActive)
     }
@@ -80,14 +85,14 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse(GoogleFitConnectService.TAG,
-                        0,
-                        R.drawable.ic_google_fit,
-                        preferences.isConnected(googleService.javaClass.simpleName)),
-                FitResponse("SamsungHealth",
-                        0,
-                        R.drawable.ic_samsung_fit,
-                        false))
+                FitResponse(googleService::class.java.simpleName,
+                        getString(R.string.google_fit),
+                        icon = R.drawable.ic_google_fit,
+                        isConnected = preferences.isConnected(googleService.javaClass.simpleName)),
+                FitResponse(samsungService::class.java.simpleName,
+                        getString(R.string.samsung_health),
+                        icon = R.drawable.ic_samsung_fit,
+                        isConnected = preferences.isConnected(samsungService::class.java.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -97,11 +102,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun connectionChangeListener() {
         serviceAdapter.onSwitchStateChangedListener()
                 .doOnNext {
-                    if (it.resourceName == GoogleFitConnectService.TAG) {
-                        handleGoogleConnection(it)
-                    } else handleSamsungConnection(it)
-                }
-                .subscribe()
+                    when (it.tagName) {
+                        GoogleFitConnectService::class.java.simpleName -> handleGoogleConnection(it)
+                        SamsungHealthService::class.java.simpleName -> handleSamsungConnection(it)
+                    }
+                }.subscribe()
     }
 
     private fun handleGoogleConnection(data: FitResponse) {
@@ -147,14 +152,13 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     override fun successConnected(service: FitConnection) {
-        preferences.setConnected(service.javaClass.simpleName, true)
+        preferences.setConnected(service::class.java.simpleName, true)
         handleResultsVisibility(true)
     }
 
     override fun disconnected(service: FitConnection) {
-        val tag = service.javaClass.getField("TAG").get(String()).toString()
-        preferences.setConnected(service.javaClass.simpleName, false)
-        resultAdapter.removeItem(tag)
+        preferences.setConnected(service::class.java.simpleName, false)
+        resultAdapter.removeItem(service::class.java.simpleName)
         handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
@@ -169,7 +173,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onPermissionDenied(service: FitConnection?) {
         if (service == null) return
+        Log.d("DashboardActivity", "onPermissionDenied ${service::class.java.simpleName}")
         serviceAdapter.onUserDeniedPermission(service::class.java.simpleName)
-
     }
 }

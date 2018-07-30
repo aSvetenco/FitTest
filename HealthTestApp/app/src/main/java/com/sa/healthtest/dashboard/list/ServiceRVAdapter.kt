@@ -1,6 +1,7 @@
 package com.sa.healthtest.dashboard.list
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,18 +40,19 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
     }
 
     fun onUserDeniedPermission(serviceName: String) {
+        Log.d("ServiceRVAdapter", "serviceName: $serviceName")
         Observable.fromIterable(items)
-                .filter { it.resourceName == serviceName }
+                .filter { it.tagName == serviceName }
                 .map { it.isConnected = false }
                 .map { getItemPositionByServiceName(serviceName) }
                 .filter { it != NO_POSTION }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ notifyItemChanged(it) })
+                .subscribe { notifyItemChanged(it) }
     }
 
     private fun getItemPositionByServiceName(serviceName: String): Int {
         for (i in items.indices) {
-            if (items[i].resourceName == serviceName) return i
+            if (items[i].tagName == serviceName) return i
         }
         return NO_POSTION
     }
