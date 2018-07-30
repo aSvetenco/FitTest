@@ -19,19 +19,23 @@ import com.sa.healthtest.data.SharedPref
 import com.sa.healthtest.data.model.FitResponse
 import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
-import com.sa.healthtest.services.GoogleAccountManager
-import com.sa.healthtest.services.GoogleFitConnectService
-import com.sa.healthtest.services.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
-import com.sa.healthtest.services.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE
+import com.sa.healthtest.services.googleFit.GoogleAccountManager
+import com.sa.healthtest.services.googleFit.GoogleFitConnectService
+import com.sa.healthtest.services.googleFit.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
+import com.sa.healthtest.services.googleFit.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE
+import com.sa.healthtest.services.samsungHealth.SamsungHealthService
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
+    private val TAG = DashboardActivity::class.java.simpleName
+    private val SAMSUNG_HEALTH_SERVICE_NAME = SamsungHealthService::class.java.simpleName
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
+    private lateinit var samsungService: SamsungHealthService
     private val serviceAdapter = ServiceRVAdapter()
     private val resultAdapter = ResultsRVAdapter()
 
@@ -52,7 +56,8 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         results.adapter = resultAdapter
         googleAccountManager = GoogleAccountManager(this)
         googleService = GoogleFitConnectService(this, googleAccountManager)
-        val services = listOf(googleService)
+        samsungService = SamsungHealthService(this)
+        val services = listOf(googleService, samsungService)
         getResults(services)
         refresh.setOnRefreshListener { getResults(services) }
         mapAndFillServiceList()
@@ -61,10 +66,9 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun getResults(services: List<FitConnection>) {
         var atLeastOnActive = false
         services.forEach {
-            if (preferences.isConnected(it.javaClass.simpleName)) {
+            if (it::class.java.simpleName != SAMSUNG_HEALTH_SERVICE_NAME)
                 it.connect()
-                atLeastOnActive = true
-            }
+            atLeastOnActive = true
         }
         handleResultsVisibility(atLeastOnActive)
     }
@@ -109,6 +113,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     private fun handleSamsungConnection(data: FitResponse) {
+        nav_menu.closeDrawer(GravityCompat.START)
+        when (data.isConnected) {
+            true -> samsungService.connect()
+            false -> samsungService.disconnect()
+        }
     }
 
     private fun initNavDrawer() {
@@ -139,6 +148,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun successConnected(service: FitConnection) {
         preferences.setConnected(service.javaClass.simpleName, true)
+        handleResultsVisibility(true)
     }
 
     override fun disconnected(service: FitConnection) {
@@ -155,5 +165,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private fun handleResultsVisibility(visibility: Boolean) {
         refresh.visibility = if (visibility) View.VISIBLE else View.GONE
         tv_alert.visibility = if (visibility) View.GONE else View.VISIBLE
+    }
+
+    override fun onPermissionDenied(service: FitConnection?) {
+        if (service == null) return
+        serviceAdapter.onUserDeniedPermission(service::class.java.simpleName)
+
     }
 }

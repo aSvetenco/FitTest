@@ -1,4 +1,4 @@
-package com.sa.healthtest.services;
+package com.sa.healthtest.services.googleFit;
 
 import android.app.Activity;
 
@@ -10,8 +10,8 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.sa.healthtest.R;
 import com.sa.healthtest.data.model.FitResponse;
-
-import io.reactivex.disposables.Disposable;
+import com.sa.healthtest.services.ConnectCallback;
+import com.sa.healthtest.services.FitConnection;
 
 import static com.google.android.gms.fitness.data.DataType.TYPE_STEP_COUNT_DELTA;
 
