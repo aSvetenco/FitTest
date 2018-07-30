@@ -1,6 +1,7 @@
 package com.sa.healthtest.dashboard.list
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,7 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
     }
 
     fun onUserDeniedPermission(serviceName: String) {
+        Log.d("ServiceRVAdapter", "serviceName: $serviceName")
         Observable.fromIterable(items)
                 .filter { it.clazzName == serviceName }
                 .map { it.isConnected = false }

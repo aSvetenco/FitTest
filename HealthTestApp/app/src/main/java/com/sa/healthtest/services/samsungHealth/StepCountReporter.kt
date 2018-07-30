@@ -81,6 +81,6 @@ class StepCountReporter(private val mStore: HealthDataStore) {
 
     companion object {
         private val TAG = "Samsung${StepCountReporter::class.java.simpleName}"
-        private val ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000L
+        private const val ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000L
     }
 }

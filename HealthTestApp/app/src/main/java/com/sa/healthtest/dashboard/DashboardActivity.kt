@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.sa.healthtest.R
@@ -35,6 +36,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var samsungService: SamsungHealthService
+
     private val serviceAdapter = ServiceRVAdapter()
     private val resultAdapter = ResultsRVAdapter()
 
@@ -46,6 +48,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         val actionbar: ActionBar? = supportActionBar
         initNavDrawer()
         initSharedPreferences()
+
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
@@ -82,14 +85,12 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         val serviceList: List<FitResponse> = listOf(
                 FitResponse(googleService::class.java.simpleName,
                         getString(R.string.google_fit),
-                        0,
-                        R.drawable.ic_google_fit,
-                        preferences.isConnected(googleService::class.java.simpleName)),
-                FitResponse(googleService::class.java.simpleName,
+                        icon = R.drawable.ic_google_fit,
+                        isConnected = preferences.isConnected(googleService.javaClass.simpleName)),
+                FitResponse(samsungService::class.java.simpleName,
                         getString(R.string.samsung_health),
-                        0,
-                        R.drawable.ic_samsung_fit,
-                        preferences.isConnected(samsungService::class.java.simpleName)))
+                        icon = R.drawable.ic_samsung_fit,
+                        isConnected = preferences.isConnected(samsungService::class.java.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -171,7 +172,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun onPermissionDenied(service: FitConnection?) {
         if (service == null) return
+        Log.d("DashboardActivity", "onPermissionDenied ${service::class.java.simpleName}")
         serviceAdapter.onUserDeniedPermission(service::class.java.simpleName)
-
     }
 }
