@@ -8,6 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="ConnectButton">
         <item name="android:layout_width">@dimen/spacing_250_dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -19,6 +24,13 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
-    <dimen name="spacing_30_dp">30dp</dimen>
-    <dimen name="spacing_250_dp">250dp</dimen>
+    <style name="ActionBar" parent="Theme.AppCompat">
+        <item name="android:titleTextStyle">@style/ActionBar.TitleTextStyle</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="ActionBar.TitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+    </style>
+
 </resources>
