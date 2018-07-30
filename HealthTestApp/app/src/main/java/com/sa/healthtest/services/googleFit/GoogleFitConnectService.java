@@ -19,7 +19,7 @@ public class GoogleFitConnectService implements FitConnection {
 
     public static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 9991;
     public static final int SIGN_IN_ACCOUNT_CODE = 9992;
-    public static final String TAG = GoogleFitConnectService.class.getSimpleName();
+    private static final String TAG = GoogleFitConnectService.class.getSimpleName();
     private GoogleSignInAccount account;
     private GoogleAccountManager accountManager;
     private final Activity activity;
@@ -89,7 +89,8 @@ public class GoogleFitConnectService implements FitConnection {
                     int value = dataSet.getDataPoints().isEmpty()
                             ? 0
                             : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                    callback.updateFitData(new FitResponse(TAG,
+                    callback.updateFitData(new FitResponse(GoogleFitConnectService.class.getSimpleName(),
+                            TAG,
                             value,
                             R.drawable.ic_google_fit,
                             true));

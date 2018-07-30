@@ -80,11 +80,13 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private fun mapAndFillServiceList() {
         val serviceList: List<FitResponse> = listOf(
-                FitResponse(getString(R.string.google_fit),
+                FitResponse(googleService::class.java.simpleName,
+                        getString(R.string.google_fit),
                         0,
                         R.drawable.ic_google_fit,
                         preferences.isConnected(googleService::class.java.simpleName)),
-                FitResponse(getString(R.string.samsung_health),
+                FitResponse(googleService::class.java.simpleName,
+                        getString(R.string.samsung_health),
                         0,
                         R.drawable.ic_samsung_fit,
                         preferences.isConnected(samsungService::class.java.simpleName)))
@@ -95,13 +97,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     private fun connectionChangeListener() {
-        serviceAdapter.onSwitchStateChangedListener()
-                .doOnNext {
-                    if (it.resourceName == GoogleFitConnectService.TAG) {
-                        handleGoogleConnection(it)
-                    } else handleSamsungConnection(it)
-                }
-                .subscribe()
+        serviceAdapter.switchListener = { response ->
+            if (response.resourceName == getString(R.string.google_fit)) {
+                handleGoogleConnection(response)
+            } else handleSamsungConnection(response)
+        }
     }
 
     private fun handleGoogleConnection(data: FitResponse) {
@@ -135,7 +135,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
             when (requestCode) {
                 GOOGLE_FIT_PERMISSIONS_REQUEST_CODE -> googleService.connect()
                 SIGN_IN_ACCOUNT_CODE -> googleAccountManager.getAccountFromIntent(data)
-                else -> error(getString(R.string.permission_cancel))
+                else -> {
+                    onPermissionDenied(googleService)
+                    error(getString(R.string.permission_cancel))
+                }
             }
         }
     }

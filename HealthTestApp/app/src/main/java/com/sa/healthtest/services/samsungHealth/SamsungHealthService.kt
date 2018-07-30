@@ -108,7 +108,8 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     private fun startReceivingData() {
         mReporter.start {
             mCallBack.updateFitData(
-                    FitResponse(TAG,
+                    FitResponse(clazzName = this::class.java.simpleName,
+                            resourceName = TAG,
                             stepCount = it,
                             icon = R.drawable.ic_samsung_fit,
                             isConnected = true))
