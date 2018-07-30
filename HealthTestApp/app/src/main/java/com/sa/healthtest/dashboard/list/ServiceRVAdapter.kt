@@ -53,13 +53,13 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
 
     class ServiceVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: FitResponse, swListener: (FitResponse) -> Unit) {
+        fun bind(item: FitResponse, switchListener: (FitResponse) -> Unit) {
             itemView.service_icon.setImageResource(item.icon)
             itemView.service_name.text = item.resourceName
             itemView.connection_switcher.isChecked = item.isConnected
             itemView.connection_switcher.setOnCheckedChangeListener { _, isChecked ->
                 item.isConnected = isChecked
-                swListener(item)
+                switchListener(item)
             }
         }
     }

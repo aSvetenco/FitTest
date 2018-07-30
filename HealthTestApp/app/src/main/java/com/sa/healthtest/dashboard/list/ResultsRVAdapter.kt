@@ -1,6 +1,7 @@
 package com.sa.healthtest.dashboard.list
 
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils.isEmpty
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,15 +14,14 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
 
     private var items = ArrayList<FitResponse>()
 
-    fun removeItem(tag: String?) {
-        if (items.isNotEmpty()) {
-            for (i in items.indices) {
-                if (items[i].resourceName == tag) {
-                    items.removeAt(i)
-                    notifyItemRemoved(i)
+    fun removeItem(clazzName: String?) {
+        items.filter { items.isNotEmpty() }
+                .forEachIndexed { i, it ->
+                    if (it.clazzName == clazzName) {
+                        items.removeAt(i)
+                        notifyItemRemoved(i)
+                    }
                 }
-            }
-        }
     }
 
     fun setData(item: FitResponse) {
