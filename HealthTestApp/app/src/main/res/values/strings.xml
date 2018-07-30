@@ -22,5 +22,4 @@
     <string name="error_perm_setting">An error occurred while setting permissions</string>
     <string name="google_fit">GoogleFit</string>
     <string name="samsung_health">Samsung health</string>
-
 </resources>
