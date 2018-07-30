@@ -32,10 +32,12 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private val TAG = DashboardActivity::class.java.simpleName
     private val SAMSUNG_HEALTH_SERVICE_NAME = SamsungHealthService::class.java.simpleName
+
     private lateinit var googleService: GoogleFitConnectService
     private lateinit var preferences: SharedPref
     private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var samsungService: SamsungHealthService
+
     private val serviceAdapter = ServiceRVAdapter()
     private val resultAdapter = ResultsRVAdapter()
 
@@ -47,6 +49,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         val actionbar: ActionBar? = supportActionBar
         initNavDrawer()
         initSharedPreferences()
+
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
@@ -84,10 +87,10 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
                         0,
                         R.drawable.ic_google_fit,
                         preferences.isConnected(googleService.javaClass.simpleName)),
-                FitResponse("SamsungHealth",
+                FitResponse(samsungService.javaClass.simpleName,
                         0,
                         R.drawable.ic_samsung_fit,
-                        false))
+                        preferences.isConnected(samsungService.javaClass.simpleName)))
         services.layoutManager = LinearLayoutManager(this)
         services.adapter = serviceAdapter
         serviceAdapter.setData(serviceList)
@@ -152,7 +155,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     }
 
     override fun disconnected(service: FitConnection) {
-        val tag = service.javaClass.getField("TAG").get(String()).toString()
+        val tag = service.javaClass.simpleName
         preferences.setConnected(service.javaClass.simpleName, false)
         resultAdapter.removeItem(tag)
         handleResultsVisibility(resultAdapter.itemCount != 0)
@@ -170,6 +173,5 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
     override fun onPermissionDenied(service: FitConnection?) {
         if (service == null) return
         serviceAdapter.onUserDeniedPermission(service::class.java.simpleName)
-
     }
 }

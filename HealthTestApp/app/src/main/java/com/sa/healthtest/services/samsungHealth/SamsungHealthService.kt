@@ -14,6 +14,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
 
     private lateinit var mHealthDataStore: HealthDataStore
     private val mCallBack = (mActivity as ConnectCallback)
+
     init {
         initSdk()
     }

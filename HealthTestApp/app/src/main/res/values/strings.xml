@@ -14,5 +14,11 @@
     <string name="by_someone">by - %s</string>
     <string name="shared_pref">health app preferences</string>
     <string name="permission_cancel">Without permission you can not use app :)</string>
+    <string name="req_install">Please install Samsung Health application</string>
+    <string name="req_update">Please update Samsung Health application</string>
+    <string name="req_enable">Please enable Samsung Health application</string>
+    <string name="req_availability">Please make Samsung Health application available</string>
+    <string name="permission_acquired">All permissions should be acquired</string>
+    <string name="error_perm_setting">An error occurred while setting permissions</string>
 
 </resources>
