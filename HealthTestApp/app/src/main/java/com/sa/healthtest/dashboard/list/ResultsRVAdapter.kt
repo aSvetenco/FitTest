@@ -58,8 +58,12 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
 
     class ResultVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: FitResponse) {
-            itemView.steps.text = itemView.context.getString(R.string.results_template, item.stepCount)
-            itemView.resource.setImageResource(item.icon)
+            itemView?.let{
+                with(it){
+                    steps.text = context.getString(R.string.results_template, item.stepCount)
+                    resource.setImageResource(item.icon)
+                }
+            }
         }
     }
 }

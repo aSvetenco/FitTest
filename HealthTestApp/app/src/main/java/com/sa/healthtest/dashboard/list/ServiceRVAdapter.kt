@@ -2,7 +2,6 @@ package com.sa.healthtest.dashboard.list
 
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.sa.healthtest.R
@@ -19,8 +18,10 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
     internal var switchListener: (FitResponse) -> Unit = { _ -> }
 
     fun setData(items: List<FitResponse>) {
-        this.items.clear()
-        this.items.addAll(items)
+        this.items.run {
+            clear()
+            addAll(items)
+        }
         notifyDataSetChanged()
     }
 
@@ -47,21 +48,29 @@ class ServiceRVAdapter : RecyclerView.Adapter<ServiceRVAdapter.ServiceVH>() {
     }
 
     private fun getItemPositionByServiceName(serviceName: String): Int {
+        var position = NO_POSTION
         for (i in items.indices) {
-            if (items[i].clazzName == serviceName) return i
+            if (items[i].clazzName == serviceName) {
+                position = i
+                break
+            }
         }
-        return NO_POSTION
+        return position
     }
 
     class ServiceVH(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(item: FitResponse, switchListener: (FitResponse) -> Unit) {
-            itemView.service_icon.setImageResource(item.icon)
-            itemView.service_name.text = item.resourceName
-            itemView.connection_switcher.isChecked = item.isConnected
-            itemView.connection_switcher.setOnCheckedChangeListener { _, isChecked ->
-                item.isConnected = isChecked
-                switchListener(item)
+            itemView?.let {
+                with(it) {
+                    service_icon.setImageResource(item.icon)
+                    service_name.text = item.resourceName
+                    connection_switcher.isChecked = item.isConnected
+                    connection_switcher.setOnCheckedChangeListener { _, isChecked ->
+                        item.isConnected = isChecked
+                        switchListener(item)
+                    }
+                }
             }
         }
     }
