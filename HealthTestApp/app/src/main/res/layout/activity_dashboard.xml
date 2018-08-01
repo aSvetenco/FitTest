@@ -9,10 +9,10 @@
     tools:openDrawer="start">
 
     <LinearLayout
+        android:id="@+id/parent_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
         <include layout="@layout/toolbar" />
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/refresh"

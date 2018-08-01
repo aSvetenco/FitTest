@@ -1,6 +1,7 @@
 package com.sa.healthtest.services.samsungHealth
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.sa.healthtest.R
 import com.sa.healthtest.data.model.FitResponse
@@ -8,48 +9,54 @@ import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
 import com.samsung.android.sdk.healthdata.*
 
-class SamsungHealthService(private val mActivity: Activity) : FitConnection, HealthDataStore.ConnectionListener {
+class SamsungHealthService : FitConnection, HealthDataStore.ConnectionListener {
 
-    private lateinit var mReporter: StepCountReporter
-    private lateinit var mHealthDataStore: HealthDataStore
-    private val mCallBack = (mActivity as ConnectCallback)
+    private var mReporter: StepCountReporter? = null
+    private var mHealthDataStore: HealthDataStore? = null
 
-    init {
-        initSdk()
-    }
+    var serviceConnectionListener: ConnectCallback? = null
 
-    private fun initSdk() {
+    var context: Context? = null
+        set(value) {
+            initSdk(value)
+        }
+
+    private var mActivity = context as Activity?
+
+    private fun initSdk(context: Context?) {
         try {
-            HealthDataService().also { it.initialize(mActivity) }
+            HealthDataService().also { it.initialize(context) }
         } catch (e: Exception) {
             with("Error initializing HealthDataService") {
                 Log.e(TAG, this, e)
-                mCallBack.error(this)
+                serviceConnectionListener?.error(this)
             }
         }
     }
 
     override fun connect() {
-        mHealthDataStore = HealthDataStore(mActivity, this).also { it.connectService() }
+        mHealthDataStore = HealthDataStore(context, this).also { it.connectService() }
     }
 
     override fun disconnect() {
-        mHealthDataStore.disconnectService()
-        mCallBack.disconnected(this)
+        mHealthDataStore?.disconnectService()
+        serviceConnectionListener?.disconnected(this)
     }
 
     /**
      * Samsung heath connected successfully
      */
     override fun onConnected() {
-        mReporter = StepCountReporter(mHealthDataStore)
-        val isPermGranted = isPermissionAcquired()
-        if (isPermGranted != null) {
-            if (isPermGranted) {
-                mCallBack.successConnected(this)
-                startReceivingData()
-            } else {
-                requestPermission()
+        if (mHealthDataStore != null) {
+            mReporter = StepCountReporter(mHealthDataStore!!)
+            val isPermGranted = isPermissionAcquired()
+            if (isPermGranted != null) {
+                if (isPermGranted) {
+                    serviceConnectionListener?.successConnected(this)
+                    startReceivingData()
+                } else {
+                    requestPermission()
+                }
             }
         }
     }
@@ -58,13 +65,8 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
      * Samsung heath connection error
      */
     override fun onConnectionFailed(result: HealthConnectionErrorResult?) {
-        mCallBack.onPermissionDenied(this)
-        mCallBack.error(when (result?.errorCode) {
-            HealthConnectionErrorResult.PLATFORM_NOT_INSTALLED -> mActivity.getString(R.string.req_install)
-            HealthConnectionErrorResult.OLD_VERSION_PLATFORM -> mActivity.getString(R.string.req_update)
-            HealthConnectionErrorResult.PLATFORM_DISABLED -> mActivity.getString(R.string.req_enable)
-            else -> mActivity.getString(R.string.req_availability)
-        })
+        serviceConnectionListener?.onPermissionDenied(this)
+        serviceConnectionListener?.error(context?.getString(errorMessageByErrorCode(result?.errorCode)))
     }
 
     /**
@@ -72,7 +74,7 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
      * if samsung health service crashes
      */
     override fun onDisconnected() {
-        mCallBack.disconnected(this)
+        serviceConnectionListener?.disconnected(this)
     }
 
     private fun requestPermission() {
@@ -85,25 +87,26 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
                         val resultMap = result.resultMap
 
                         if (resultMap.containsValue(java.lang.Boolean.FALSE)) {
-                            mCallBack.error(mActivity.getString(R.string.permission_acquired))
-                            mCallBack.onPermissionDenied(this)
+                            serviceConnectionListener?.error(context?.getString(R.string.permission_acquired))
+                            serviceConnectionListener?.onPermissionDenied(this)
                         } else {
                             // Get the current step count and display it
                             startReceivingData()
-                            mCallBack.successConnected(this)
+                            serviceConnectionListener?.successConnected(this)
                         }
                     }
         } catch (e: Exception) {
-            with(mActivity.getString(R.string.error_perm_setting)) {
+            with(context?.getString(R.string.error_perm_setting)) {
                 Log.e(TAG, this, e)
-                mCallBack.error(this)
+                serviceConnectionListener?.error(this)
             }
         }
     }
 
     private fun startReceivingData() {
-        mReporter.start {
-            mCallBack.updateFitData(
+
+        mReporter?.start {
+            serviceConnectionListener?.updateFitData(
                     FitResponse(this::class.java.simpleName,
                             stepCount = it,
                             icon = R.drawable.ic_samsung_fit,
@@ -122,11 +125,23 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
         } catch (e: Exception) {
             with("Permission request failed") {
                 Log.e(TAG, this, e)
-                mCallBack.onPermissionDenied(this@SamsungHealthService)
-                mCallBack.error(this)
+                serviceConnectionListener?.onPermissionDenied(this@SamsungHealthService)
+                serviceConnectionListener?.error(this)
             }
         }
         return false
+    }
+
+    internal fun errorMessageByErrorCode(errorCode: Int?): Int {
+
+        if (errorCode == null) return R.string.unknown_error
+
+        return when (errorCode) {
+            HealthConnectionErrorResult.PLATFORM_NOT_INSTALLED -> R.string.req_install
+            HealthConnectionErrorResult.OLD_VERSION_PLATFORM -> R.string.req_update
+            HealthConnectionErrorResult.PLATFORM_DISABLED -> R.string.req_enable
+            else -> R.string.req_availability
+        }
     }
 
     companion object {

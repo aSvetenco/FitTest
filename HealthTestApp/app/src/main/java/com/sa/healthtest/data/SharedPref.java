@@ -16,7 +16,7 @@ public class SharedPref {
     }
 
 
-    public void setConnected(String flag, boolean isConnected){
-        preferences.edit().putBoolean(flag, isConnected).apply();
+    public void setConnected(String flag, boolean isConnected) {
+       preferences.edit().putBoolean(flag, isConnected).apply();
     }
 }

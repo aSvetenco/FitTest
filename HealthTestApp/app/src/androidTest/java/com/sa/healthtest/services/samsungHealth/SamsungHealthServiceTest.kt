@@ -1,53 +1,50 @@
 package com.sa.healthtest.services.samsungHealth
 
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.sa.healthtest.dashboard.DashboardActivity
+import com.samsung.android.sdk.healthdata.HealthDataService
+import com.samsung.android.sdk.healthdata.HealthDataStore
 import org.junit.After
 import org.junit.Before
+
+import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import android.support.test.rule.ActivityTestRule
-import com.sa.healthtest.dashboard.DashboardActivity
-import com.samsung.android.sdk.healthdata.HealthDataStore
-import junit.framework.Assert.assertNotNull
-import org.junit.Rule
-
+import org.mockito.Mockito
 
 @RunWith(AndroidJUnit4::class)
 class SamsungHealthServiceTest {
-    @Rule
-    var mainActivityActivityTestRule = ActivityTestRule<DashboardActivity>(DashboardActivity::class.java)
-    private var dashboardActivity: DashboardActivity? = null
-    private lateinit var mHealthDataStore: HealthDataStore
 
+    @get:Rule
+    val mDashBoardActivityRule = ActivityTestRule<DashboardActivity>(DashboardActivity::class.java)
+    lateinit var mDashBoardActivity: DashboardActivity
+    private var mMockListener: HealthDataStore.ConnectionListener? = null
+    private var mHealthDataStore: HealthDataStore? = null
 
     @Before
     fun setUp() {
-        dashboardActivity = mainActivityActivityTestRule.activity
-        mHealthDataStore
+        mDashBoardActivity = mDashBoardActivityRule.activity
+        HealthDataService().also { it.initialize(mDashBoardActivity) }
+        mMockListener = Mockito.mock(HealthDataStore.ConnectionListener::class.java)
     }
 
     @After
     fun tearDown() {
+
+    }
+
+    @Test
+    fun initSdk() {
+        val healthDataService = HealthDataService()
+        assertNotNull(healthDataService)
+        assertNotNull(mDashBoardActivity)
     }
 
     @Test
     fun connect() {
-        assertNotNull(dashboardActivity)
-    }
-
-    @Test
-    fun disconnect() {
-    }
-
-    @Test
-    fun onConnected() {
-    }
-
-    @Test
-    fun onConnectionFailed() {
-    }
-
-    @Test
-    fun onDisconnected() {
+        mHealthDataStore = HealthDataStore(mDashBoardActivity, mMockListener)
+        assertNotNull(mHealthDataStore)
     }
 }

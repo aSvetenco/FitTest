@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
@@ -58,11 +59,18 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         results.adapter = resultAdapter
         googleAccountManager = GoogleAccountManager(this)
         googleService = GoogleFitConnectService(this, googleAccountManager)
-        samsungService = SamsungHealthService(this)
+        samsungService = initSamsungHealthService()
         val services = listOf(googleService, samsungService)
         getResults(services)
         refresh.setOnRefreshListener { getResults(services) }
         mapAndFillServiceList()
+    }
+
+    private fun initSamsungHealthService(): SamsungHealthService {
+        return SamsungHealthService().also {
+            it.context = this@DashboardActivity
+            it.serviceConnectionListener = this@DashboardActivity
+        }
     }
 
     private fun getResults(services: List<FitConnection>) {
@@ -161,11 +169,11 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
-    override fun error(message: String) {
+    override fun error(message: String?) {
         Toast.makeText(this, "Error message: $message", Toast.LENGTH_LONG).show()
     }
 
-    private fun handleResultsVisibility(visibility: Boolean) {
+    fun handleResultsVisibility(visibility: Boolean) {
         refresh.visibility = if (visibility) View.VISIBLE else View.GONE
         tv_alert.visibility = if (visibility) View.GONE else View.VISIBLE
     }
