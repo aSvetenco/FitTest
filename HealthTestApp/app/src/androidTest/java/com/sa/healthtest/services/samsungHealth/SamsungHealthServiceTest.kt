@@ -5,6 +5,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.sa.healthtest.dashboard.DashboardActivity
 import com.samsung.android.sdk.healthdata.HealthDataService
 import com.samsung.android.sdk.healthdata.HealthDataStore
+import junit.framework.Assert.assertNotNull
 import org.junit.After
 import org.junit.Before
 
