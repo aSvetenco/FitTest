@@ -8,7 +8,7 @@ import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
 import com.samsung.android.sdk.healthdata.*
 
-class SamsungHealthService(private val mActivity: Activity) : FitConnection, HealthDataStore.ConnectionListener {
+class SamsungHealthService(private val mActivity: Activity): FitConnection, HealthDataStore.ConnectionListener {
 
     private lateinit var mReporter: StepCountReporter
     private lateinit var mHealthDataStore: HealthDataStore
@@ -30,7 +30,8 @@ class SamsungHealthService(private val mActivity: Activity) : FitConnection, Hea
     }
 
     override fun connect() {
-        mHealthDataStore = HealthDataStore(mActivity, this).also { it.connectService() }
+        mHealthDataStore = HealthDataStore(mActivity, this)
+                .also { it.connectService() }
     }
 
     override fun disconnect() {

@@ -22,10 +22,9 @@ import com.sa.healthtest.data.model.FitResponse
 import com.sa.healthtest.data.setServiceConnected
 import com.sa.healthtest.services.ConnectCallback
 import com.sa.healthtest.services.FitConnection
-import com.sa.healthtest.services.googleFit.GoogleAccountManager
+import com.sa.healthtest.services.googleFit.GOOGLE_ACCOUNT_CODE
+import com.sa.healthtest.services.googleFit.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
 import com.sa.healthtest.services.googleFit.GoogleFitConnectService
-import com.sa.healthtest.services.googleFit.GoogleFitConnectService.GOOGLE_FIT_PERMISSIONS_REQUEST_CODE
-import com.sa.healthtest.services.googleFit.GoogleFitConnectService.SIGN_IN_ACCOUNT_CODE
 import com.sa.healthtest.services.samsungHealth.SamsungHealthService
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.nav_menu_dashboard.*
@@ -35,7 +34,6 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     private val TAG = DashboardActivity::class.java.simpleName
     private lateinit var googleService: GoogleFitConnectService
-    private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var samsungService: SamsungHealthService
     private lateinit var preferences: SharedPreferences
     private val serviceAdapter = ServiceRVAdapter()
@@ -55,8 +53,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         results.layoutManager = LinearLayoutManager(this)
         results.adapter = resultAdapter
         preferences = getSharedPreferences(getString(R.string.shared_pref), Context.MODE_PRIVATE)
-        googleAccountManager = GoogleAccountManager(this)
-        googleService = GoogleFitConnectService(this, googleAccountManager)
+        googleService = GoogleFitConnectService(this)
         samsungService = SamsungHealthService(this)
         val services = listOf(googleService, samsungService)
         getResults(services)
@@ -129,7 +126,7 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 GOOGLE_FIT_PERMISSIONS_REQUEST_CODE -> googleService.connect()
-                SIGN_IN_ACCOUNT_CODE -> googleAccountManager.getAccountFromIntent(data)
+                GOOGLE_ACCOUNT_CODE -> googleService.setAccount(data)
                 else -> {
                     onPermissionDenied(googleService)
                     error(getString(R.string.permission_cancel))
@@ -151,11 +148,12 @@ class DashboardActivity : AppCompatActivity(), ConnectCallback {
 
     override fun disconnected(service: FitConnection) {
         preferences.setServiceConnected(service::class.java.simpleName, false)
+        val tag = service::class.java.simpleName
         resultAdapter.removeItem(service::class.java.simpleName)
         handleResultsVisibility(resultAdapter.itemCount != 0)
     }
 
-    override fun error(message: String) {
+    override fun error(message: String?) {
         Toast.makeText(this, "Error message: $message", Toast.LENGTH_LONG).show()
     }
 

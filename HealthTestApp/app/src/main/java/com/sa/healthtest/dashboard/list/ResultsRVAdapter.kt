@@ -31,7 +31,7 @@ class ResultsRVAdapter : RecyclerView.Adapter<ResultsRVAdapter.ResultVH>() {
             notifyDataSetChanged()
         } else {
             for (i in items.indices) {
-                if (items[i].resourceName == item.resourceName) {
+                if (items[i].clazzName == item.clazzName) {
                     items[i] = item
                     notifyItemChanged(i)
                     isAdded = true
