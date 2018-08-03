@@ -18,6 +18,7 @@ class SamsungHealthService : FitConnection, HealthDataStore.ConnectionListener {
 
     var context: Context? = null
         set(value) {
+            field = value
             initSdk(value)
         }
 

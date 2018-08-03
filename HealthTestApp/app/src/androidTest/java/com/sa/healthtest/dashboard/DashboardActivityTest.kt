@@ -3,11 +3,14 @@ package com.sa.healthtest.dashboard
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.contrib.DrawerActions.close
+import android.support.test.espresso.contrib.DrawerActions.open
+import android.support.test.espresso.contrib.DrawerMatchers.isClosed
+import android.support.test.espresso.contrib.DrawerMatchers.isOpen
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.system.Os.close
 import com.sa.healthtest.R
 import org.junit.Before
 import org.junit.Rule
